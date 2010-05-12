@@ -101,6 +101,8 @@ sub _make_item {
 
 =pod
 
+=for Pod::Coverage weave_section
+
 =head1 DESCRIPTION
 
 This section plugin will produce a hunk of pod that references the main module of a dist
