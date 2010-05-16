@@ -61,6 +61,7 @@ sub weave_section {
 				command => 'head1',
 				content => 'SEE ALSO',
 				children => [
+					# TODO I forgot why I didn't just use the List Transformer... it deserves a follow-up
 					Pod::Elemental::Element::Nested->new( {
 						command => 'over',
 						content => '4',
@@ -101,12 +102,15 @@ sub _make_item {
 
 =pod
 
+=for stopwords dist dzil
+
 =for Pod::Coverage weave_section
 
 =head1 DESCRIPTION
 
 This section plugin will produce a hunk of pod that references the main module of a dist
-from it's submodules and adds any other text already present in the pod.
+from it's submodules and adds any other text already present in the pod. It will do this
+only if it is being built with L<Dist::Zilla> because it needs the data from the dzil object.
 
 In the main module, this section plugin just transforms the links into a proper list. In the
 submodules, it also adds the link to the main module.
