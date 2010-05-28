@@ -2,6 +2,9 @@ Revision history for Pod::Weaver::Section::SeeAlso
 
 {{$NEXT}}
 
+0.003
+	Released: 2010-05-28 18:01:23 UTC
+
 	Fix how we detect existing SEE ALSO section
 
 * 0.002
