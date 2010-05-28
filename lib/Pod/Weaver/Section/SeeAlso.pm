@@ -128,6 +128,8 @@ only if it is being built with L<Dist::Zilla> because it needs the data from the
 In the main module, this section plugin just transforms the links into a proper list. In the
 submodules, it also adds the link to the main module.
 
+For an example of what the hunk looks like, look at the L</SEE ALSO> section in this POD :)
+
 WARNING: Please do not put any other POD commands in your SEE ALSO section!
 
 What you should do when you want to add extra links is:
@@ -147,6 +149,10 @@ And this module will automatically convert it into:
 	=item *
 	L<Bar::Baz>
 	=back
+
+=head1 SEE ALSO
+L<Pod::Weaver>
+L<Dist::Zilla>
 
 =cut
 
