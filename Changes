@@ -2,6 +2,11 @@ Revision history for Pod::Weaver::Section::SeeAlso
 
 {{$NEXT}}
 
+0.004
+	Released: 2010-05-28 20:09:38 UTC
+
+	Add example hunk of POD
+
 0.003
 	Released: 2010-05-28 18:01:23 UTC
 
