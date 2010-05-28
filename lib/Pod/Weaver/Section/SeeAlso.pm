@@ -25,7 +25,7 @@ sub weave_section {
 		my $para = $input->{pod_document}->children->[$i];
 		next unless $para->isa('Pod::Elemental::Element::Nested')
 			and $para->command eq 'head1'
-			and $para->content eq 'SEE ALSO';
+			and $para->content =~ /^SEE\s+ALSO/s;	# catches both "head1 SEE ALSO\n\nL<baz>" and "head1 SEE ALSO\nL<baz>" format
 
 		$see_also = $para;
 		splice( @{ $input->{pod_document}->children }, $i, 1 );
@@ -48,6 +48,19 @@ sub weave_section {
 				}
 			} else {
 				die 'Unknown POD in SEE ALSO: ' . ref( $child );
+			}
+		}
+
+		# Sometimes the links are in the content!
+		if ( $see_also->content =~ /^SEE\s+ALSO\s+(.+)$/s ) {
+			foreach my $l ( split /\n/, $1 ) {
+				chomp $l;
+				next if ! length $l;
+				if ( $l !~ /^L\<.+\>$/ ) {
+					die 'Unknown POD in SEE ALSO: ' . $l;
+				} else {
+					push( @links, $l );
+				}
 			}
 		}
 	}
