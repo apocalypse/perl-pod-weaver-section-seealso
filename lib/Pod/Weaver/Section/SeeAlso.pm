@@ -9,6 +9,7 @@ use Pod::Weaver::Role::Section 3.100710;
 with 'Pod::Weaver::Role::Section';
 
 sub weave_section {
+	## no critic ( ProhibitAccessOfPrivateData )
 	my ($self, $document, $input) = @_;
 	my $zilla = $input->{zilla} or return;
 
@@ -155,4 +156,3 @@ L<Pod::Weaver>
 L<Dist::Zilla>
 
 =cut
-
