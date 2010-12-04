@@ -75,7 +75,7 @@ sub weave_section {
 				command => 'head1',
 				content => 'SEE ALSO',
 				children => [
-					# TODO I forgot why I didn't just use the List Transformer... it deserves a follow-up
+					# I could have used the list transformer but rjbs said it's more sane to generate it myself :)
 					Pod::Elemental::Element::Nested->new( {
 						command => 'over',
 						content => '4',
