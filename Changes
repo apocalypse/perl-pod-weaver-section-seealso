@@ -2,6 +2,9 @@ Revision history for Pod::Weaver::Section::SeeAlso
 
 {{$NEXT}}
 
+1.001
+	Released: 2010-12-14 03:06:57 UTC
+
 	Release with updated Dist::Zilla
 	Add attribute to control the link back to the main module
 	Add attribute to specify extra links ( thanks GETTY! )
