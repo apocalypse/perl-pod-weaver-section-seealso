@@ -2,16 +2,67 @@ package Pod::Weaver::Section::SeeAlso;
 
 # ABSTRACT: add a SEE ALSO pod section
 
-use Moose 1.01;
+use Moose 1.03;
 use Moose::Autobox 0.10;
 
-use Pod::Weaver::Role::Section 3.100710;
-with 'Pod::Weaver::Role::Section';
+with 'Pod::Weaver::Role::Section' => { -version => '3.100710' };
+
+sub mvp_multivalue_args { qw( links ) }
+
+=attr add_main_link
+
+A boolean value controlling whether the link back to the main module should be
+added in the submodules.
+
+Defaults to true.
+
+=cut
+
+has add_main_link => (
+	is => 'ro',
+	isa => 'Bool',
+	default => 1,
+);
+
+=attr header
+
+Specify the content to be displayed before the list of links is shown.
+
+The default is a sufficient explanation (see L</SEE ALSO>).
+
+=cut
+
+has header => (
+	is => 'ro',
+	isa => 'Str',
+	default => <<'EOPOD',
+Please see those modules/websites for more information related to this module.
+EOPOD
+
+);
+
+=attr links
+
+Specify a list of links you want to add to the SEE ALSO section.
+
+You can either specify it like this: "Foo::Bar" or do it in POD format: "L<Foo::Bar>". This
+module will automatically add the proper POD formatting if it is missing.
+
+The default is an empty list.
+
+=cut
+
+has links => (
+	is => 'ro',
+	isa => 'ArrayRef[Str]',
+	default => sub { [ ] },
+);
 
 sub weave_section {
 	## no critic ( ProhibitAccessOfPrivateData )
 	my ($self, $document, $input) = @_;
-	my $zilla = $input->{zilla} or return;
+
+	my $zilla = $input->{zilla} or die 'Please use Dist::Zilla with this module!';
 
 	# find the main module's name
 	my $main = $zilla->main_module->name;
@@ -41,11 +92,7 @@ sub weave_section {
 				foreach my $l ( split /\n/, $child->content ) {
 					chomp $l;
 					next if ! length $l;
-					if ( $l !~ /^L\<.+\>$/ ) {
-						die 'Unknown POD in SEE ALSO: ' . $l;
-					} else {
-						push( @links, $l );
-					}
+					push( @links, $l );
 				}
 			} else {
 				die 'Unknown POD in SEE ALSO: ' . ref( $child );
@@ -57,17 +104,28 @@ sub weave_section {
 			foreach my $l ( split /\n/, $1 ) {
 				chomp $l;
 				next if ! length $l;
-				if ( $l !~ /^L\<.+\>$/ ) {
-					die 'Unknown POD in SEE ALSO: ' . $l;
-				} else {
-					push( @links, $l );
-				}
+				push( @links, $l );
 			}
 		}
 	}
-	if ( ! $is_main ) {
-		unshift( @links, "L<$main>" );
+	if ( $self->add_main_link and ! $is_main ) {
+		unshift( @links, $main );
 	}
+
+	# Add links specified in the document
+	# Code copied from Pod::Weaver::Section::Name, thanks RJBS!
+	# TODO how do we pick up multiple times?
+	my ($extralinks) = $input->{ppi_document}->serialize =~ /^\s*#+\s*SEEALSO:\s*(.+)$/m;
+	if ( defined $extralinks and length $extralinks ) {
+		# get the list!
+		my @data = split( /\,/, $extralinks );
+		$_ =~ s/^\s+//g for @data;
+		$_ =~ s/\s+$//g for @data;
+		push( @links, $_ ) for @data;
+	}
+
+	# Add extra links
+	push( @links, $_ ) for @{ $self->links };
 
 	if ( @links ) {
 		$document->children->push(
@@ -75,6 +133,9 @@ sub weave_section {
 				command => 'head1',
 				content => 'SEE ALSO',
 				children => [
+					Pod::Elemental::Element::Pod5::Ordinary->new( {
+						content => $self->header,
+					} ),
 					# I could have used the list transformer but rjbs said it's more sane to generate it myself :)
 					Pod::Elemental::Element::Nested->new( {
 						command => 'over',
@@ -94,11 +155,11 @@ sub weave_section {
 }
 
 sub _make_item {
-	my( $title, $contents ) = @_;
+	my( $link ) = @_;
 
-	my $str = $title;
-	if ( defined $contents ) {
-		$str .= "\n\n$contents";
+	# Is it proper POD?
+	if ( $link !~ /^L\<.+\>$/ ) {
+		$link = 'L<' . $link . '>';
 	}
 
 	return Pod::Elemental::Element::Nested->new( {
@@ -106,7 +167,7 @@ sub _make_item {
 		content => '*',
 		children => [
 			Pod::Elemental::Element::Pod5::Ordinary->new( {
-				content => $str,
+				content => $link,
 			} ),
 		],
 	} );
@@ -118,7 +179,7 @@ sub _make_item {
 
 =for stopwords dist dzil
 
-=for Pod::Coverage weave_section
+=for Pod::Coverage weave_section mvp_multivalue_args
 
 =head1 DESCRIPTION
 
@@ -131,13 +192,14 @@ submodules, it also adds the link to the main module.
 
 For an example of what the hunk looks like, look at the L</SEE ALSO> section in this POD :)
 
-WARNING: Please do not put any other POD commands in your SEE ALSO section!
+WARNING: Please do not put any POD commands in your SEE ALSO section!
 
 What you should do when you want to add extra links is:
 
 	=head1 SEE ALSO
-	L<Foo::Bar>
-	L<Bar::Baz>
+	Foo::Bar
+	Bar::Baz
+	www.cpan.org
 
 And this module will automatically convert it into:
 
@@ -149,7 +211,19 @@ And this module will automatically convert it into:
 	L<Foo::Bar>
 	=item *
 	L<Bar::Baz>
+	=item *
+	L<www.cpan.org>
 	=back
+
+You can specify more links by using the "links" attribute or by specifying it as a comment. The
+format of the comment is:
+
+	# SEEALSO: Foo::Bar, Module::Nice::Foo, www.foo.com
+
+At this time you can only use one comment line. If you need to do it multiple times, please prod me
+to update the module or give me a patch :)
+
+The way the links are ordered is: POD in the module, links attribute, comment links.
 
 =head1 SEE ALSO
 L<Pod::Weaver>

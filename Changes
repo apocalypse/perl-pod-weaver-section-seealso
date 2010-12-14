@@ -2,6 +2,12 @@ Revision history for Pod::Weaver::Section::SeeAlso
 
 {{$NEXT}}
 
+	Release with updated Dist::Zilla
+	Add attribute to control the link back to the main module
+	Add attribute to specify extra links ( thanks GETTY! )
+	Add the ability to specify extra links as a comment in the file ( thanks GETTY! )
+	Add attribute to specify the introduction text
+
 1.000
 	Released: 2010-05-30 18:05:59 UTC
 
