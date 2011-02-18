@@ -159,7 +159,7 @@ sub _make_item {
 
 	# Is it proper POD?
 	if ( $link !~ /^L\<.+\>$/ ) {
-		$link = 'L<' . $link . '>';
+		$link = 'L<' . $link . '|' . $link . '>';
 	}
 
 	return Pod::Elemental::Element::Nested->new( {
