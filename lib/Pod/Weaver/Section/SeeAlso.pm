@@ -62,25 +62,25 @@ sub weave_section {
 	## no critic ( ProhibitAccessOfPrivateData )
 	my ($self, $document, $input) = @_;
 
-	my $zilla = $input->{zilla} or die 'Please use Dist::Zilla with this module!';
+	my $zilla = $input->{'zilla'} or die 'Please use Dist::Zilla with this module!';
 
 	# find the main module's name
 	my $main = $zilla->main_module->name;
-	my $is_main = $main eq $input->{filename} ? 1 : 0;
+	my $is_main = $main eq $input->{'filename'} ? 1 : 0;
 	$main =~ s|^lib/||;
 	$main =~ s/\.pm$//;
 	$main =~ s|/|::|g;
 
 	# Is the SEE ALSO section already in the POD?
 	my $see_also;
-	foreach my $i ( 0 .. $#{ $input->{pod_document}->children } ) {
-		my $para = $input->{pod_document}->children->[$i];
+	foreach my $i ( 0 .. $#{ $input->{'pod_document'}->children } ) {
+		my $para = $input->{'pod_document'}->children->[$i];
 		next unless $para->isa('Pod::Elemental::Element::Nested')
 			and $para->command eq 'head1'
 			and $para->content =~ /^SEE\s+ALSO/s;	# catches both "head1 SEE ALSO\n\nL<baz>" and "head1 SEE ALSO\nL<baz>" format
 
 		$see_also = $para;
-		splice( @{ $input->{pod_document}->children }, $i, 1 );
+		splice( @{ $input->{'pod_document'}->children }, $i, 1 );
 		last;
 	}
 
@@ -115,7 +115,7 @@ sub weave_section {
 	# Add links specified in the document
 	# Code copied from Pod::Weaver::Section::Name, thanks RJBS!
 	# TODO how do we pick up multiple times?
-	my ($extralinks) = $input->{ppi_document}->serialize =~ /^\s*#+\s*SEEALSO:\s*(.+)$/m;
+	my ($extralinks) = $input->{'ppi_document'}->serialize =~ /^\s*#+\s*SEEALSO:\s*(.+)$/m;
 	if ( defined $extralinks and length $extralinks ) {
 		# get the list!
 		my @data = split( /\,/, $extralinks );
@@ -159,6 +159,7 @@ sub _make_item {
 
 	# Is it proper POD?
 	if ( $link !~ /^L\<.+\>$/ ) {
+		# include the link text so we satisfy Perl::Critic::Policy::Documentation::RequirePodLinksIncludeText
 		$link = 'L<' . $link . '|' . $link . '>';
 	}
 
@@ -226,7 +227,7 @@ to update the module or give me a patch :)
 The way the links are ordered is: POD in the module, links attribute, comment links.
 
 =head1 SEE ALSO
-L<Pod::Weaver>
-L<Dist::Zilla>
+Pod::Weaver
+Dist::Zilla
 
 =cut

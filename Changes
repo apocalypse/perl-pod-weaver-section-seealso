@@ -2,6 +2,8 @@ Revision history for Pod::Weaver::Section::SeeAlso
 
 {{$NEXT}}
 
+	Tweaked the actual L<> links to include the text to satisfy Perl::Critic ( thanks LESPEA! )
+
 1.001
 	Released: 2010-12-14 03:06:57 UTC
 
