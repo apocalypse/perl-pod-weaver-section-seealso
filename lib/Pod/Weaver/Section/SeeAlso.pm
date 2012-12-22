@@ -186,8 +186,8 @@ sub _make_item {
 =head1 DESCRIPTION
 
 This section plugin will produce a hunk of pod that references the main module of a dist
-from it's submodules and adds any other text already present in the pod. It will do this
-only if it is being built with L<Dist::Zilla> because it needs the data from the dzil object.
+from its submodules, and adds any other text already present in the POD. It will do this
+only if it is being built with L<Dist::Zilla>, because it needs the data from the dzil object.
 
 In the main module, this section plugin just transforms the links into a proper list. In the
 submodules, it also adds the link to the main module.
@@ -217,7 +217,7 @@ And this module will automatically convert it into:
 	L<www.cpan.org>
 	=back
 
-You can specify more links by using the "links" attribute or by specifying it as a comment. The
+You can specify more links by using the "links" attribute, or by specifying it as a comment. The
 format of the comment is:
 
 	# SEEALSO: Foo::Bar, Module::Nice::Foo, www.foo.com
