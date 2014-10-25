@@ -45,7 +45,7 @@ EOPOD
 
 Specify a list of links you want to add to the SEE ALSO section.
 
-You can either specify it like this: "Foo::Bar" or do it in POD format: "L<Foo::Bar>". This
+You can either specify it like this: "Moose" or do it in POD format: "L<Moose>". This
 module will automatically add the proper POD formatting if it is missing.
 
 The default is an empty list.
