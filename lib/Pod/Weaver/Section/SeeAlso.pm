@@ -114,12 +114,10 @@ sub weave_section {
 
 	# Add links specified in the document
 	# Code copied from Pod::Weaver::Section::Name, thanks RJBS!
-	# TODO how do we pick up multiple times?
-	# see code here for multiple comment logic - http://cpansearch.perl.org/src/XENO/Dist-Zilla-Plugin-OurPkgVersion-0.1.4/lib/Dist/Zilla/Plugin/OurPkgVersion.pm
-	my ($extralinks) = $input->{'ppi_document'}->serialize =~ /^\s*#+\s*SEEALSO:\s*(.+)$/m;
-	if ( defined $extralinks and length $extralinks ) {
+	my (@extra) = ($input->{'ppi_document'}->serialize =~ /^\s*#+\s*SEE\s*ALSO\s*:\s*(.+)$/mg);
+	foreach my $l ( @extra ) {
 		# get the list!
-		my @data = split( /\,/, $extralinks );
+		my @data = split( /\,/, $l );
 		$_ =~ s/^\s+//g for @data;
 		$_ =~ s/\s+$//g for @data;
 		push( @links, $_ ) for @data;
@@ -221,9 +219,6 @@ You can specify more links by using the "links" attribute or by specifying it as
 format of the comment is:
 
 	# SEEALSO: Foo::Bar, Module::Nice::Foo, www.foo.com
-
-At this time you can only use one comment line. If you need to do it multiple times, please prod me
-to update the module or give me a patch :)
 
 The way the links are ordered is: POD in the module, links attribute, comment links.
 
