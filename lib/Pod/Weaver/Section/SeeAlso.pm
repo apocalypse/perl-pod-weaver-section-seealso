@@ -3,7 +3,6 @@ package Pod::Weaver::Section::SeeAlso;
 # ABSTRACT: add a SEE ALSO pod section
 
 use Moose 1.03;
-use Moose::Autobox 0.10;
 
 with 'Pod::Weaver::Role::Section' => { -version => '3.100710' };
 
@@ -127,7 +126,7 @@ sub weave_section {
 	push( @links, $_ ) for @{ $self->links };
 
 	if ( @links ) {
-		$document->children->push(
+		push @{ $document->children },
 			Pod::Elemental::Element::Nested->new( {
 				command => 'head1',
 				content => 'SEE ALSO',
@@ -148,8 +147,7 @@ sub weave_section {
 						],
 					} ),
 				],
-			} ),
-		);
+			} );
 	}
 }
 
